@@ -30,27 +30,23 @@ def parse_employee(employee)
   { name: name, email: email }
 end
 
-def insert_employee(employee)
-  db_connection do |conn|
-    result = conn.exec_params("SELECT id FROM employees WHERE name = $1", [employee[:name]])
-    if result.to_a.empty?
-      result = conn.exec_params("INSERT INTO employees (name, email) VALUES ($1, $2) RETURNING id", [employee[:name], employee[:email]])
-    end
-    result.first["id"]
-  end
-end
+#################################################
+# Metaprogramming insert for employee & product #
+#################################################
 
-################
-### Product  ###
-################
-
-def insert_product(product)
-  db_connection do |conn|
-    result = conn.exec_params("SELECT id FROM products WHERE name = $1", [product[:name]])
-    if result.to_a.empty?
-      result = conn.exec_params("INSERT INTO products (name) VALUES ($1) RETURNING id", [product[:name]])
+["employee", "product"].each do |table_name|
+  define_method("insert_#{table_name}".to_sym) do |resource|
+    db_connection do |conn|
+      result = conn.exec_params("SELECT id FROM #{table_name}s WHERE name = $1", [resource[:name]])
+      if result.to_a.empty?
+        if table_name == "employee"
+          result = conn.exec_params("INSERT INTO employees (name, email) VALUES ($1, $2) RETURNING id", [resource[:name], resource[:email]])
+        else
+          result = conn.exec_params("INSERT INTO products (name) VALUES ($1) RETURNING id", [resource[:name]])
+        end
+      end
+      result.first["id"]
     end
-    result.first["id"]
   end
 end
 
