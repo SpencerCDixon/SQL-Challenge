@@ -83,23 +83,23 @@ end
 ################
 
 def insert_invoice(transaction, foreign_keys)
-  arguments = [
-    transaction[:sale_date],
-    transaction[:sale_amount],
-    transaction[:units_sold],
-    transaction[:invoice_frequency],
-    foreign_keys[:employee_id],
-    foreign_keys[:product_id],
-    foreign_keys[:customer_id]
-  ]
+  # arguments = [
+    # transaction[:sale_date],
+    # transaction[:sale_amount],
+    # transaction[:units_sold],
+    # transaction[:invoice_frequency],
+    # foreign_keys[:employee_id],
+    # foreign_keys[:product_id],
+    # foreign_keys[:customer_id]
+  # ]
 
-  db_connection do |conn|
-    sql = <<-eos
-    INSERT INTO invoices (sale_date, sale_amount, units_sold, frequency, employee_id, product_id, customer_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    eos
-    conn.exec_params(sql, arguments)
-  end
+  # db_connection do |conn|
+    # sql = <<-eos
+    # INSERT INTO invoices (sale_date, sale_amount, units_sold, frequency, employee_id, product_id, customer_id)
+    # VALUES ($1, $2, $3, $4, $5, $6, $7)
+    # eos
+    # conn.exec_params(sql, arguments)
+  # end
 end
 
 ################
@@ -124,9 +124,7 @@ CSV.foreach("sales.csv", headers: true, header_converters: :symbol) do |row|
   customer = parse_customer(transaction[:customer_and_account_no])
   customer_id = insert_customer(customer)
 
-  # Create final invoice
-  foreign_keys = { employee_id: employee_id, product_id: product_id, customer_id: customer_id }
-  insert_invoice(transaction, foreign_keys)
+
 end
 
 puts "Import complete.  You now have a normalized database!"
