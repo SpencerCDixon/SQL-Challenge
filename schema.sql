@@ -14,7 +14,7 @@ CREATE TABLE products(
 CREATE TABLE customers(
   id serial PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  account_number integer NOT NULL UNIQUE
+  account_number varchar(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE invoices(

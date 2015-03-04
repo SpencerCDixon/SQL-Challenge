@@ -18,29 +18,20 @@ def db_connection
   end
 end
 
-################
-### Employee ###
-################
+############################################################
+# Metaprogramming insert for employee & product & customer #
+############################################################
 
-def parse_employee(employee)
-  split = employee.split(' ')
-  name = split[0] + ' ' + split[1]
-  email = split[2].gsub(/[()]/, '')
-
-  { name: name, email: email }
-end
-
-#################################################
-# Metaprogramming insert for employee & product #
-#################################################
-
-["employee", "product"].each do |table_name|
+["employee", "product", "customer"].each do |table_name|
   define_method("insert_#{table_name}".to_sym) do |resource|
     db_connection do |conn|
       result = conn.exec_params("SELECT id FROM #{table_name}s WHERE name = $1", [resource[:name]])
       if result.to_a.empty?
         if table_name == "employee"
           result = conn.exec_params("INSERT INTO employees (name, email) VALUES ($1, $2) RETURNING id", [resource[:name], resource[:email]])
+        elsif table_name == "customer"
+          sql = "INSERT INTO customers (name, account_number) VALUES ($1, $2) RETURNING id"
+          result = conn.exec_params(sql, [resource[:name], resource[:account_number]])
         else
           result = conn.exec_params("INSERT INTO products (name) VALUES ($1) RETURNING id", [resource[:name]])
         end
@@ -51,28 +42,25 @@ end
 end
 
 ################
-### Customer ###
+### Parsing  ###
 ################
+
+def parse_employee(employee)
+  split = employee.split(' ')
+  name = split[0] + ' ' + split[1]
+  email = split[2].gsub(/[()]/, '')
+
+  { name: name, email: email }
+end
 
 def parse_customer(customer)
   split = customer.split(' ')
   name = split[0]
-  account_number = split[1].gsub(/[()]/, '').to_i
+  account_number = split[1].gsub(/[()]/, '')
 
   { name: name, account_number: account_number }
 end
 
-def insert_customer(customer)
-  db_connection do |conn|
-    result = conn.exec_params("SELECT id FROM customers WHERE name = $1", [customer[:name]])
-
-    if result.to_a.empty?
-      sql = "INSERT INTO customers (name, account_number) VALUES ($1, $2) RETURNING id"
-      result = conn.exec_params(sql, [customer[:name], customer[:account_number]])
-    end
-    result.first["id"]
-  end
-end
 
 ################
 ### Invoice  ###
