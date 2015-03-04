@@ -1,0 +1,8 @@
+---
+title: "Korning"
+type: "challenge"
+description: "Define a normalized database schema to store sales information and import it from a CSV file."
+tags: "database, postgresql, sql, csv, normalization, parsing, idempotence"
+ignore:
+- "korning.md"
+- "sales.csv"
