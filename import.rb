@@ -61,7 +61,7 @@ end
 def parse_customer(customer)
   split = customer.split(' ')
   name = split[0]
-  account_number = split[1].gsub(/[()]/, '').to_i
+  account_number = split[1].gsub(/[()]/, '')
 
   { name: name, account_number: account_number }
 end
