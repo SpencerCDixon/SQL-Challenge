@@ -23,7 +23,7 @@ end
 ############################################################
 
 ["employee", "product", "customer"].each do |table_name|
-  define_method("insert_#{table_name}".to_sym) do |resource|
+  define_method("insert_#{table_name}") do |resource|
     db_connection do |conn|
       result = conn.exec_params("SELECT id FROM #{table_name}s WHERE name = $1", [resource[:name]])
       if result.to_a.empty?
